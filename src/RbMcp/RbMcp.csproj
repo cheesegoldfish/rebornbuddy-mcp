@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows8.0</TargetFramework>
+    <LangVersion>10</LangVersion>
+    <OutputType>Library</OutputType>
+    <RootNamespace>RbMcp</RootNamespace>
+    <AssemblyName>RbMcp</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <!-- RB loads plugins from its own folder; never drag RB's own assemblies along. -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Compile-time only. RebornBuddy.dll is already loaded in the host process, and it
+         has Roslyn + Newtonsoft ILMerged into it as public types, so we get the C# syntax
+         API for free without a NuGet reference that would fight the host's copy. -->
+    <PackageReference Include="RebornBuddy.ReferenceAssemblies" Version="1.0.803">
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <!-- Nothing else. Every other dependency must come from RebornBuddy.dll or the .NET 8
+         shared framework, or RB's plugin loader silently drops the assembly. Notably
+         System.Configuration.ConfigurationManager (the home of RB's [Setting] attribute)
+         is in neither - see the comment in BridgeSettings.cs. -->
+  </ItemGroup>
+
+  <!-- Drop the built plugin straight into RB so the only manual step is restarting RB
+       (and for most work you won't even need that - see hot reload in the README).
+
+       Nothing here may hardcode an install path: every developer puts RebornBuddy
+       somewhere different. Resolution order is explicit override, then environment, then
+       the conventional location.
+
+         dotnet build -p:RbPluginDir=D:\Games\RebornBuddy\Plugins\RbMcp
+         setx REBORNBUDDY_PATH D:\Games\RebornBuddy                      -->
+  <PropertyGroup>
+    <RebornBuddyPath Condition="'$(RebornBuddyPath)' == '' And '$(REBORNBUDDY_PATH)' != ''">$(REBORNBUDDY_PATH)</RebornBuddyPath>
+    <RebornBuddyPath Condition="'$(RebornBuddyPath)' == '' And Exists('C:\RebornBuddy\RebornBuddy\RebornBuddy.exe')">C:\RebornBuddy\RebornBuddy</RebornBuddyPath>
+    <RbPluginDir Condition="'$(RbPluginDir)' == '' And '$(RebornBuddyPath)' != ''">$(RebornBuddyPath)\Plugins\RbMcp</RbPluginDir>
+  </PropertyGroup>
+
+  <Target Name="DeployToRebornBuddy" AfterTargets="Build">
+    <!-- Say so out loud. A silent skip here produces the most confusing failure this project
+         has: a green build, no plugin in RB's list, and nothing in any log. -->
+    <Warning Condition="'$(RbPluginDir)' == ''"
+             Text="Could not locate RebornBuddy, so the plugin was NOT deployed. Set REBORNBUDDY_PATH, or build with -p:RbPluginDir=&lt;path&gt;\Plugins\RbMcp." />
+
+    <MakeDir Condition="'$(RbPluginDir)' != ''" Directories="$(RbPluginDir)" />
+    <Copy Condition="'$(RbPluginDir)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(RbPluginDir)" ContinueOnError="true" />
+    <Copy Condition="'$(RbPluginDir)' != '' And Exists('$(TargetDir)$(AssemblyName).pdb')" SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFolder="$(RbPluginDir)" ContinueOnError="true" />
+    <!-- Required. RB discovers plugins by compiling .cs files under Plugins\; it never
+         scans for bare DLLs, so without this loader the plugin is invisible. -->
+    <Copy Condition="'$(RbPluginDir)' != ''" SourceFiles="$(MSBuildThisFileDirectory)..\..\loader\RbMcpLoader.cs" DestinationFolder="$(RbPluginDir)" ContinueOnError="true" />
+    <Message Condition="'$(RbPluginDir)' != ''" Importance="high" Text="RbMcp -> $(RbPluginDir)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Compile check only. Its output is never shipped or loaded.
+
+    RebornBuddy compiles RbMcpLoader.cs itself at startup, so a syntax or API error
+    in that file does not surface as a build failure here - it surfaces as the plugin
+    silently not appearing in RB's list, which is a miserable thing to debug. Building the
+    file against RB's reference assemblies turns that into a normal compile error.
+
+    Kept out of the main project on purpose: the loader must not end up inside
+    RbMcp.dll, or the assembly would contain a BotPlugin whose job is to load that
+    same assembly.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows8.0</TargetFramework>
+    <LangVersion>10</LangVersion>
+    <OutputType>Library</OutputType>
+    <AssemblyName>RbMcpLoader.check</AssemblyName>
+    <RootNamespace>RbMcpLoader</RootNamespace>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RebornBuddy.ReferenceAssemblies" Version="1.0.803">
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

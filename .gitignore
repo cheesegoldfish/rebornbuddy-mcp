@@ -1,0 +1,17 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+node_modules/
+mcp/dist/
+*.binlog
+
+# Runtime state. These live beside the deployed plugin, not in the repo - but a stray copy
+# here would leak an auth token or other players' character names, so refuse them outright.
+*.token
+RbMcp.json
+RbMcp.observations.json
+
+# Local working notes, never shipped.
+HANDOFF.md

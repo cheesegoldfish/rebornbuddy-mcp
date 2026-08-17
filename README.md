@@ -226,6 +226,11 @@ worst hour this project can cost you.
 See `AGENTS.md` for the architecture and the reasoning behind it, and
 `docs/eval-cookbook.md` for RB API idioms that are not discoverable from the assemblies.
 
+**I don't take pull requests.** Nothing personal about yours — this is a tool I keep sharp
+for my own work, and carrying someone else's change through every RB patch is a commitment
+I'm not making. It's MIT precisely so you don't need my permission: fork it, make it yours,
+never mention it to me again. See `SECURITY.md` for the rest of what I'm not signing up for.
+
 ## License
 
 MIT — see `LICENSE`.

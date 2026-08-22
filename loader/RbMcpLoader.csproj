@@ -14,7 +14,7 @@
   -->
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows8.0</TargetFramework>
+    <TargetFramework>net10.0-windows8.0</TargetFramework>
     <LangVersion>10</LangVersion>
     <OutputType>Library</OutputType>
     <AssemblyName>RbMcpLoader.check</AssemblyName>
@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RebornBuddy.ReferenceAssemblies" Version="1.0.803">
+    <PackageReference Include="RebornBuddy.ReferenceAssemblies" Version="1.0.902">
       <ExcludeAssets>runtime</ExcludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

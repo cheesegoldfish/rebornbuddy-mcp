@@ -32,7 +32,7 @@ Full install (build + deploy + register the MCP server):
 .\scripts\deploy.ps1
 ```
 
-- Target framework: `net8.0-windows8.0`, C# 10, matching RB itself.
+- Target framework: `net10.0-windows8.0`, C# 10, matching RB itself (RB 1.0.900+ runs on .NET 10).
 - `RebornBuddy.ReferenceAssemblies` is referenced **compile-time only**
   (`ExcludeAssets=runtime`). Never let RB's own assemblies copy into the plugin folder.
 
